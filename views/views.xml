@@ -1,0 +1,53 @@
+<odoo>
+  <data>
+
+    <record model="ir.ui.view" id="stock_warehouse_kanban">
+        <field name="name">warehouse.kanban</field>
+        <field name="model">stock.warehouse</field>
+        <field name="arch" type="xml">
+            <kanban class="o_res_partner_kanban">
+                <field name="id" />
+                <field name="name"/>
+                <field name="lot_stock_id" />
+                <field name="partner_id"/>
+                <field name="nb_article"/>
+                <field name="bg_color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_res_partner_kanban" t-attf-style="{{'background-color: ' + record.bg_color.raw_value}};">
+                            <div class="oe_kanban_details">
+                                <div style="padding: 10px">
+                                  <div>
+                                    <strong class="oe_partner_heading" style="font-weight: 1000; font-size: 15px;"><field name="name"/></strong>
+                                  </div>
+                                  <div>
+                                    <field name="partner_id"/>
+                                  </div>
+                                </div>
+                                <hr/>
+                                <div style="padding: 20px">
+                                  <ul>
+                                      <li><strong>Nbr d'article:</strong> <field name="nb_article"/></li>
+                                      <li><strong>Valeur Vente:</strong> <field name="sales_value"/></li>
+                                      <li><strong>Valeur Achat:</strong> <field name="purchases_value"/></li>
+                                  </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="mangoose_custom.valorisation_action_window">
+      <field name="name">Valorisation</field>
+      <field name="res_model">stock.warehouse</field>
+      <field name="view_mode">kanban</field>
+    </record>
+
+    <menuitem name="Valorisation" id="mangoose_custom" parent="stock.menu_stock_root"
+              action="mangoose_custom.valorisation_action_window"/>
+    
+  </data>
+</odoo>
