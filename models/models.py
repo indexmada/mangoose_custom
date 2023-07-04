@@ -33,18 +33,29 @@ class StockWarehouse(models.Model):
                 self.get_random_color()
 
     def _compute_nb_article(self):
-    	for rec in self:
-    		stock_quant_ids = self.env['stock.quant'].sudo().search([('location_id', '=', rec.lot_stock_id.id)])
-    		quantity = sum(stock_quant_ids.mapped('quantity')) - sum(stock_quant_ids.mapped('reserved_quantity'))
-    		rec.nb_article = quantity
+        for rec in self:
+            stock_quant_ids = self.env['stock.quant'].sudo().search([('location_id', '=', rec.lot_stock_id.id)])
+            quantity = sum(stock_quant_ids.mapped('quantity')) - sum(stock_quant_ids.mapped('reserved_quantity'))
+            rec.nb_article = quantity
 
     def _compute_sales_value(self):
-    	for rec in self:
-    		sale_order_ids = self.env['sale.order'].sudo().search([('state', 'in', ['sent', 'sale', 'done']), ('warehouse_id', '=', rec.id)])
-    		rec.sales_value = sum(sale_order_ids.mapped('amount_total'))
+        for rec in self:
+            stock_quant_ids = self.env['stock.quant'].sudo().search([('location_id', '=', rec.lot_stock_id.id)])
+            val = 0
+            for stock in stock_quant_ids:
+                quant = stock.quantity - stock.reserved_quantity
+                cost = stock.product_id.lst_price
+                val += quant * cost
+
+            rec.sales_value = val
 
     def _compute_purchases_value(self):
-    	for rec in self:
-    		picking_type_ids = self.env['stock.picking.type'].sudo().search([('warehouse_id', '=', rec.id)])
-    		purchase_order_ids = self.env['purchase.order'].sudo().search([('picking_type_id', 'in', picking_type_ids.ids)])
-    		rec.purchases_value = sum(purchase_order_ids.mapped('amount_total'))
+        for rec in self:
+            stock_quant_ids = self.env['stock.quant'].sudo().search([('location_id', '=', rec.lot_stock_id.id)])
+            val = 0
+            for stock in stock_quant_ids:
+                quant = stock.quantity - stock.reserved_quantity
+                cost = stock.product_id.standard_price
+                val += quant * cost
+
+            rec.purchases_value = val
