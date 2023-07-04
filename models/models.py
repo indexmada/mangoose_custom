@@ -35,7 +35,8 @@ class StockWarehouse(models.Model):
     def _compute_nb_article(self):
         for rec in self:
             stock_quant_ids = self.env['stock.quant'].sudo().search([('location_id', '=', rec.lot_stock_id.id)])
-            quantity = sum(stock_quant_ids.mapped('quantity')) - sum(stock_quant_ids.mapped('reserved_quantity'))
+            quantity = sum(stock_quant_ids.mapped('quantity'))
+            # - sum(stock_quant_ids.mapped('reserved_quantity'))
             rec.nb_article = quantity
 
     def _compute_sales_value(self):
@@ -43,7 +44,7 @@ class StockWarehouse(models.Model):
             stock_quant_ids = self.env['stock.quant'].sudo().search([('location_id', '=', rec.lot_stock_id.id)])
             val = 0
             for stock in stock_quant_ids:
-                quant = stock.quantity - stock.reserved_quantity
+                quant = stock.quantity
                 cost = stock.product_id.lst_price
                 val += quant * cost
 
@@ -54,7 +55,7 @@ class StockWarehouse(models.Model):
             stock_quant_ids = self.env['stock.quant'].sudo().search([('location_id', '=', rec.lot_stock_id.id)])
             val = 0
             for stock in stock_quant_ids:
-                quant = stock.quantity - stock.reserved_quantity
+                quant = stock.quantity
                 cost = stock.product_id.standard_price
                 val += quant * cost
 
